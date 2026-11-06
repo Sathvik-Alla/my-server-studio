@@ -2,8 +2,8 @@
 
 ## STUDIO-001 · Launch a tested calculator on an existing server
 
-**Status:** Pending learner scope agreement and actual evidence.
-**Next step:** Confirm your clone with the coach, then follow [Lesson 01](studio/lesson-01.md).
+**Status:** The new calculator launch and the first PR's full Ubuntu CI passed. The learner reviewed and approved the final documentation.
+**Next step:** Verify CI on the final PR commit before requesting merge approval.
 **Instructor implementation:** [issue #9](https://github.com/kaw393939/373_hosting/issues/9).
 Create your own issue from the [lesson template](.github/ISSUE_TEMPLATE/studio-calculator.md).
 
@@ -18,10 +18,20 @@ An explicitly agreed adoption of a matching existing deployment is recorded
 as adoption, not a fresh launch. This bounded lesson does not certify the whole
 server baseline or a vulnerability-free image.
 
-- **Public hostname:** Pending.
-- **New launch or adopted deployment, and reason:** Pending.
-- **Own issue / feature branch:** Pending.
-- **Agreed scope or actual access/configuration gap:** Pending.
+- **Agreed public hostname:** `qa-is373-sathvik.duckdns.org`.
+- **Intended result:** One new calculator project on the replacement hosting baseline, using the pinned [instructor release](studio/calculator-release.json), the existing Traefik `websecure` entry point, and `hosting-web`. Check for hostname and route conflicts before starting. Preserve the welcome site and Traefik configuration. A conflict or matching existing route requires separate review.
+- **Pre-launch browser observation:** The learner reported Chrome displayed `NET::ERR_CERT_AUTHORITY_INVALID` on the calculator hostname before deployment.
+- **Post-launch browser observation:** The learner reported that Chrome loaded the calculator without a certificate warning and displayed `42` for `6 × 7`. See [LEARNING.md](LEARNING.md#browser-observation).
+- **Own issue / feature branch:** [STUDIO-001 issue #1](https://github.com/Sathvik-Alla/my-server-studio/issues/1) is open and tracked by local branch `codex/studio-001-calculator`.
+- **Original server prerequisite gap:** After destroying the previous droplet, the learner confirmed there were no running droplets and no recovery image for it in DigitalOcean Backups & Snapshots. The original server cannot be restored through DigitalOcean backups or snapshots.
+- **Replacement baseline:** The learner rebuilt the hosting baseline on Ubuntu 24.04 LTS and verified the SSH host fingerprint, key authentication, and sudo access.
+- **SSH hardening complete:** The learner validated and reloaded the SSH configuration, confirmed key login and sudo in a fresh session, and verified that a fresh root login was rejected.
+- **Docker installation complete:** The learner copied the course installer over SCP. The first execution failed at `set -euo pipefail` with `invalid option name`. Windows CRLF line endings were suspected. The learner reported that the successful run pulled the `hello-world` image, printed `Hello from Docker!`, reported Docker Compose `v5.7.0`, and returned to the shell without errors.
+- **DuckDNS complete:** The learner confirmed that the welcome-site and calculator hostnames resolved to the replacement server.
+- **Studio read-only checks passed:** After the Windows SSH transport fix, the learner reported a ready, read-only Studio doctor result with two existing containers and sudo required.
+- **Hosting configuration validated:** The learner reported that the course generator created `runtime/compose.yaml` and `docker compose config --quiet` returned without errors. The generated dashboard configuration binds to server loopback for SSH tunnel access.
+- **HTTPS hosting baseline complete:** The learner verified that Traefik and the welcome-site container were running on `hosting-web`. Chrome initially returned `NET::ERR_CERT_AUTHORITY_INVALID`, and Traefik logged `contact email has forbidden domain "example.com"`. The learner replaced the placeholder email privately, regenerated and validated Compose, and reapplied the baseline stack. The learner reported that Traefik logged successful Let's Encrypt account registration, HTTP-01 validation, and certificate issuance for `is373-sathvik.duckdns.org`. Windows PowerShell `curl.exe -fsS` succeeded with certificate verification enabled and returned the expected welcome-page HTML.
+- **Completed locally:** The clone and Windows studio setup are complete, and the [classroom trial](LEARNING.md#classroom-trial) is recorded.
 
 Private SSH targets and configuration stay in ignored local state. Share only
 reviewed, selected evidence; never commit credentials or raw server output.
@@ -30,12 +40,12 @@ reviewed, selected evidence; never commit credentials or raw server output.
 
 | Evidence | Actual result / link |
 |---|---|
-| Prepared Black/Pylint/pytest and real-image browser checks | Not run; full local E2E needs local Docker or actual CI evidence |
-| Hosted image/commit, trusted HTTPS, valid and rejected API cases | Not verified; export selected evidence with `report` |
-| Preservation of unrelated services | Not verified |
-| Own prediction, check interpretation, browser observation and keep/revise reason | [LEARNING.md](LEARNING.md), Pending; disclose assistance |
-| Accuracy review before publishing learner excerpts | Pending |
-| Actual PR, latest CI, merge and issue closure | Pending |
+| Prepared Black/Pylint/pytest and real-image browser checks | Windows `studio.py check --fast`: Black passed (8 files). Pylint reported three `E1101` errors for Unix-only `os.geteuid` and `os.chown`. Pytest stopped at collection because Windows lacks `signal.SIGHUP`. Local Chromium E2E was unrun because the Docker engine was unavailable. The full Ubuntu Studio check passed on commit `41d7a04`, including Black, Pylint, pytest, and both real-image Chromium tests. [Actions run](https://github.com/Sathvik-Alla/my-server-studio/actions/runs/42279540486) |
+| Hosted image/commit, trusted HTTPS, valid and rejected API cases | The saved `launch` report recorded `passed` and `launched`, matched the pinned release, and passed trusted public HTTPS, multiplication, divide-by-zero, and numeric-string rejection checks. See [sanitized launch evidence](studio/evidence.json). |
+| Preservation of unrelated services | The launch checks recorded both existing hosting containers as unchanged. |
+| Own prediction, check interpretation, browser observation and keep/revise reason | All four are recorded in [LEARNING.md](LEARNING.md), including the learner's adoption of the coach-assisted interpretation and keep decision. |
+| Accuracy review before publishing learner excerpts | The learner approved the classroom trial, prediction, browser observation, check interpretation, and keep decision for publication. |
+| Actual PR, latest CI, merge and issue closure | [PR #2](https://github.com/Sathvik-Alla/my-server-studio/pull/2) links issue #1. `studio`, `validate`, and `integration-contract` passed on commit `41d7a04`. Final PR commit verification, merge, and issue closure are pending. [Actions run](https://github.com/Sathvik-Alla/my-server-studio/actions/runs/42279540486) |
 
 Link the exported `studio/evidence.json`, actual CI and issue/PR when available.
 CI does not deploy this server. A fixture, green check, timestamp, closed issue
