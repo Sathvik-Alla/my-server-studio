@@ -2,10 +2,12 @@
 
 import base64
 import json
+import os
 from pathlib import Path
 import shlex
 import subprocess
 import sys
+import zlib
 
 from studio_tools import remote
 
@@ -60,11 +62,17 @@ def _ssh(config, command, *, source=None, interactive=False):
     arguments += [config["host"], command]
     try:
         if interactive:
+            environment = None
+            if sys.platform == "win32":
+                # Git for Windows' MSYS glob expansion can truncate quoted arguments.
+                environment = os.environ.copy()
+                environment["MSYS"] = f"{environment.get('MSYS', '')} noglob".strip()
             with subprocess.Popen(
                 arguments,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
+                env=environment,
             ) as process:
                 transcript = []
                 while character := process.stdout.read(1):
@@ -153,12 +161,17 @@ def doctor(config):
     encoded = base64.b64encode(json.dumps(bundle).encode()).decode()
     source = (ROOT / "studio_tools" / "remote.py").read_text()
     if config["sudo"]:
-        script = base64.b64encode(source.encode()).decode()
-        program = f"import base64; exec(base64.b64decode('{script}'))"
-        command = (
-            f"sudo python3 -c {shlex.quote(program)} doctor "
-            f"--bundle-base64 {shlex.quote(encoded)}"
+        # Keep the interactive SSH command below Windows' process length limit.
+        payload = zlib.compress(encoded.encode() + b"\0" + source.encode())
+        script = base64.b64encode(payload).decode()
+        # Escape shell metacharacters in the fixed bootstrap without quote delimiters.
+        program = (
+            r"import\ base64,sys,zlib\;\ "
+            r"bundle,source=zlib.decompress\(base64.b64decode\(sys.argv.pop\(1\)\)\)"
+            r".split\(bytes\(\[0\]\),1\)\;\ "
+            r"sys.argv.append\(bundle.decode\(\)\)\;\ exec\(source\)"
         )
+        command = f"sudo python3 -c {program} {script} doctor --bundle-base64"
         result = _ssh(config, command, interactive=True)
         return _parse_report(result.stdout)
     command = f"python3 - doctor --bundle-base64 {shlex.quote(encoded)}"
