@@ -2,8 +2,8 @@
 
 ## STUDIO-001 · Launch a tested calculator on an existing server
 
-**Status:** New calculator launch passed and sanitized evidence was reviewed. Local fast checks encountered Windows compatibility errors. Full CI is pending.
-**Next step:** Review the local check results and complete the remaining review checkpoints in [Lesson 01](studio/lesson-01.md).
+**Status:** The new calculator launch and the first PR's full Ubuntu CI passed. The learner reviewed and approved the final documentation.
+**Next step:** Verify CI on the final PR commit before requesting merge approval.
 **Instructor implementation:** [issue #9](https://github.com/kaw393939/373_hosting/issues/9).
 Create your own issue from the [lesson template](.github/ISSUE_TEMPLATE/studio-calculator.md).
 
@@ -40,12 +40,12 @@ reviewed, selected evidence; never commit credentials or raw server output.
 
 | Evidence | Actual result / link |
 |---|---|
-| Prepared Black/Pylint/pytest and real-image browser checks | Windows `studio.py check --fast`: Black passed (8 files). Pylint reported three `E1101` errors for Unix-only `os.geteuid` and `os.chown` in `studio_tools/remote.py`. Pytest stopped at collection because Windows lacks `signal.SIGHUP`. The local Docker engine was unavailable, so real-image Chromium E2E was not run. The Ubuntu GitHub Actions checks are pending. |
+| Prepared Black/Pylint/pytest and real-image browser checks | Windows `studio.py check --fast`: Black passed (8 files). Pylint reported three `E1101` errors for Unix-only `os.geteuid` and `os.chown`. Pytest stopped at collection because Windows lacks `signal.SIGHUP`. Local Chromium E2E was unrun because the Docker engine was unavailable. The full Ubuntu Studio check passed on commit `41d7a04`, including Black, Pylint, pytest, and both real-image Chromium tests. [Actions run](https://github.com/Sathvik-Alla/my-server-studio/actions/runs/42279540486) |
 | Hosted image/commit, trusted HTTPS, valid and rejected API cases | The saved `launch` report recorded `passed` and `launched`, matched the pinned release, and passed trusted public HTTPS, multiplication, divide-by-zero, and numeric-string rejection checks. See [sanitized launch evidence](studio/evidence.json). |
 | Preservation of unrelated services | The launch checks recorded both existing hosting containers as unchanged. |
-| Own prediction, check interpretation, browser observation and keep/revise reason | Prediction and browser observation recorded in [LEARNING.md](LEARNING.md). Check interpretation and keep/revise reason pending. |
-| Accuracy review before publishing learner excerpts | Learner approved the classroom trial, prediction, and browser observation for publication. |
-| Actual PR, latest CI, merge and issue closure | Pending |
+| Own prediction, check interpretation, browser observation and keep/revise reason | All four are recorded in [LEARNING.md](LEARNING.md), including the learner's adoption of the coach-assisted interpretation and keep decision. |
+| Accuracy review before publishing learner excerpts | The learner approved the classroom trial, prediction, browser observation, check interpretation, and keep decision for publication. |
+| Actual PR, latest CI, merge and issue closure | [PR #2](https://github.com/Sathvik-Alla/my-server-studio/pull/2) links issue #1. `studio`, `validate`, and `integration-contract` passed on commit `41d7a04`. Final PR commit verification, merge, and issue closure are pending. [Actions run](https://github.com/Sathvik-Alla/my-server-studio/actions/runs/42279540486) |
 
 Link the exported `studio/evidence.json`, actual CI and issue/PR when available.
 CI does not deploy this server. A fixture, green check, timestamp, closed issue
